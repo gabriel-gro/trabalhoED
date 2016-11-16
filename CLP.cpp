@@ -23,7 +23,8 @@ class CLP{
         //inserir(LingProg);
         //remove(LingProg);
         //listar();
-        //buscar(
+        //buscar();
+        //transfere( CLP clp02 , opcao);
 };
 
 CLP::CLP(const char nomeArq[] = "arqLinguagens.txt"){
