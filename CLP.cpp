@@ -21,6 +21,7 @@ void inserir();
 void listar();
 //LingProg buscar();
 //CLP* transfere( CLP clp02 , opcao);
+//int posInsercao();
 
 
 int main()
@@ -65,36 +66,35 @@ int menu(){
 }   
 
 void inserir(){
-    LingProg novo;
+    LingProg novo;                  // criando uma variavel do tipo LingProg para atribuir no arquivo
+    
+    // Abrindo arquivo em modo de leitura
     ofstream arquivo("dados.dat", ios::binary | ios::app);      //Abrindo arquivo ( modo binario, falando que so se pode acrecentar ) ios::binary|ios::append
         
-    if(!arquivo){
+    
+    if(!arquivo){                   // Testa se arquivo contem erro    
         cerr << "arquivo não pode ser aberto para gravacao" << endl;
         return;
     }
-    // atribuindo valores a struct LingProg (linguagem de programacao)
+    // Atribuindo valores a struct LingProg (linguagem de programacao)
     cout << "|Nome: ";              // nome da linguagem
-    cin.get();                      // para contornar possiveis erros
+    cin.ignore();
     cin.getline(novo.nome, 20);     // para pegar todo o conteudo daquela linha, com essa quantidade de caracteres 
     
-    cout << "|Ano de Criacao: ";    // Ano de criacao
-    cin.get();
+    cout << "|Ano de Criacao: ";    // Ano de criacao                   // para contornar possiveis erros com caracteres anteriores
     cin >> novo.anoCriacao;
     
     cout << "|Ultimo Acesso: ";     // Ultimo acceso que teve, para possiveis modificacoes
-    cin.get();
     cin >> novo.ultimoAcesso;
     
     cout << "|versao: ";            // Versao atual
-    cin.get();
     cin >> novo.versao;
     
     cout << "|autor: ";             // Autor da linguagem
-    cin.get();
+    cin.ignore();
     cin.getline(novo.autor, 20);
     
     cout << "|Tipo: ";              // Tipo;  exemplos: Funcional, lógica, imperativa, POO, etc...
-    cin.get();
     cin.getline(novo.tipo, 12);     // perde o 1º caracter da linha ao inserir
     
     arquivo.write((const char *)&novo, sizeof(LingProg));    // Escrita em arquivo binario, mandando a referencia do obj e o tamanho
@@ -102,7 +102,6 @@ void inserir(){
     
     arquivo.close();                //fechando o arquivo que foi aberto
 }
-
 
 void listar(){
     ifstream arquivo("dados.dat",ios::binary);
@@ -116,5 +115,34 @@ void listar(){
              << "|Versao: " << dados.versao << endl
              << "|Autor: " << dados.autor << endl
              << "|Tipo: " << dados.tipo << endl
-             << endl;    }
+             << endl;   
+    }
 }
+
+//int posInsercao(){
+        
+    //ifstream arquivo("dados.dat",ios::binary);      // Abre o arquivo no modo leitura
+    //arquivo.seekg(0);                               // posicao de leitura no inicio arquivo
+    
+    //LingProg elementos;                             // Variavel do tipo criado ( LingProg)
+    //int pos=0;                                      // Variavel verificador de posicao
+    
+    //while(arquivo.read((char *)&elementos, sizeof(LingProg)){
+        //if(strcmp(elementos.nome, "") == 0){        
+            //break;
+        //}
+        
+        //++pos;
+    //}
+//}
+
+
+
+
+
+
+
+
+
+
+
