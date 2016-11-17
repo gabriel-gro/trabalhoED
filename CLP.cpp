@@ -12,6 +12,7 @@
 
 using namespace std;
 
+// Estrutura de um registro Tipo: LingProg
 typedef struct{
     char nome[20];
     int anoCriacao;
@@ -22,74 +23,102 @@ typedef struct{
     bool ativo;
 }LingProg;
 
-int menu();
-void inserir();
-void remove();
-void listar();
-void buscar();
-//CLP* transfere(CLP clp02 , opcao);
-int posInsercao();
-
-
-int main()
-{
-    int op;
-    do{
-        op = menu();
-        switch(op){
-            case 0:
-                break;
-            case 1:
-                inserir();
-                break;
-            case 2:
-                remove();
-                break;
-            case 3:
-                listar();
-                break;
-            case 4:
-                buscar();
-                break;
-            default:
-                cout << "| Escolha uma opcao valida" << endl;
-                break;
-        }
-    }while(op != 0);
-    
-    
-    return 0;
+void lingImprime(LingProg dados){
+    cout << "\n|Nome: " << dados.nome << endl
+         << "|Ano De Criacao: " << dados.anoCriacao << endl
+         << "|Ultimo Acesso: " << dados.ultimoAcesso << endl
+         << "|Versao: " << dados.versao << endl
+         << "|Autor: " << dados.autor << endl
+         << "|Tipo: " << dados.tipo << endl
+         << "|Ativo: "<< dados.ativo << endl
+         << endl;
 }
 
-// Menu para informar as opcoes ao usuario
-int menu(){
-    int op;
-    cout << "|-------------------------------------------------------|" << endl
-         << "|                         MENU                          |" << endl   
-         << "|-------------------------------------------------------|" << endl
-         << "|[1] - Inserir                                          |" << endl
-         << "|[2] - remover                                          |" << endl
-         << "|[3] - listar                                           |" << endl
-         << "|[4] - buscar                                           |" << endl
-         << "|[5] - Transferir                                       |" << endl
-         << "|[0] - SAIR                                             |" << endl
-         << "|-------------------------------------------------------|" << endl; 
-    cout << "|> ";
-    cin >> op;
+class CLP{
+    private:
+        char nomeArq[20];
+    public:
+        CLP(const char nome[20]);
+        bool arqExiste(const char nome[15]);
+        int posInsercao();
+        void inserir();
+        void listar();
+        void remove();
+        void buscar();
+        void transfere();
+        int quantRegistros();
+};
+
+// Criando um arquivo binario externo
+CLP::CLP(const char nome[] = "dados.dat"){
+    fstream arquivo;
+    strcpy(nomeArq, nome);
+    if(!arqExiste(nomeArq)){
+        arquivo.open(nome, ios::binary | ios::out);
+        arquivo.close();
+    }
+    arquivo.open(nome, ios::binary | ios::out | ios::in);
+    arquivo.close();
+}
+
+
+// retorna tru caso ja exista, false caso precisa criar
+bool CLP::arqExiste(const char nome[15]){
+    fstream arquivo;
+    arquivo.open(nome, ios::binary | ios::out | ios::in );
+    if(arquivo)
+        return 1;
+    else
+        return 0;
+}
+
+// funcao posInsercao, retorna um inteiro com a posicao de insercao
+// A posicao pode ser um registro antigo inativo, ou a ultima posicao do arquivo
+int CLP::posInsercao(){
+    // Abre o arquivo no modo leitura E BINARIO
+    fstream arquivo;
+    arquivo.close();
+    arquivo.open(nomeArq,ios::binary | ios::in);    
     
-    // retorna um inteiro informando a opcao escolhida
-    return op;
-} 
-  
+    // posicao de leitura no inicio arquivo  
+    arquivo.seekg(0);
+    
+    // Variavel do tipo criado ( LingProg)
+    LingProg elementos;
+    
+    // Variavel verificador de posicao                            
+    int pos=0;
+    // Percorre o arquivo verificando registros excluidos
+    // Quando encontra um elemento excluido anteriormente ele para neste
+    while(( arquivo.read((char *)&elementos, sizeof(LingProg)) ) and ( elementos.ativo ) ){
+        ++pos;
+    }
+    
+    // Fecha o arquivo
+    arquivo.close();
+    
+    // Retorna a posicao 
+    // Pos * sizeof(o tamanho de LingProg), para ter a posicao exata no arquivo
+    return pos * int(sizeof(LingProg));
+}
+
 // Insercao sera feita aparti do controle de posicao posIncercao()
-void inserir(){
-    
+void CLP::inserir(){
+    fstream arquivo;
     // criando uma variavel do tipo LingProg para inserir no arquivo
     LingProg novo;
     
     //Abrindo arquivo em modo binario, leitura e escrita
-    fstream arquivo("dados.dat", ios::binary | ios::in | ios::out );      
+    arquivo.open(nomeArq, ios::binary | ios::in | ios::out ); 
     
+    
+    //Caso arquivo nao tenha sido criado antes
+    //if(!arquivo){
+        //arquivo.close();
+        //arquivo.open(nomeArq, ios::out);
+        //arquivo.close();
+        //arquivo.open(nomeArq, ios::binary | ios::in | ios::out );   
+    //}
     
     // Testa se ocorreu erro na abertura
     if(!arquivo){                      
@@ -126,6 +155,7 @@ void inserir(){
     
     // Tipo;  exemplos: Funcional, lógica, imperativa, POO, etc...
     cout << "|Tipo: ";              
+    cin.getline(novo.tipo, 12);
     
     novo.ativo = true;
     
@@ -141,20 +171,22 @@ void inserir(){
     arquivo.close();                
 }
 
-//  Impressao dos dados do arquivo
-void listar(){
-    // Abertura do arquivo em modo binario e leitura 
-    ifstream arquivo("dados.dat",ios::binary);
+// Impressao dos dados do arquivo
+void CLP::listar(){
+    fstream arquivo;
+    //Abertura do arquivo em modo binario e leitura 
+    arquivo.close();
+    arquivo.open(nomeArq,ios::binary | ios::in);
     
-    // Posicao de leitura no inicio  
+     //Posicao de leitura no inicio  
     arquivo.seekg(0);
     
     
     LingProg dados;
     
-    // Teste para continuar rodando enquanto tiver registro do ttamanho LingProg
+     //Teste para continuar rodando enquanto tiver registro do ttamanho LingProg
     while(arquivo.read((char *)&dados, sizeof(LingProg))){                  
-        // Para imprimir somente os dados ativos
+         //Para imprimir somente os dados ativos
         //if(dados.ativo){                                                
             cout << "|Nome: " << dados.nome << endl
                  << "|Ano De Criacao: " << dados.anoCriacao << endl
@@ -168,12 +200,14 @@ void listar(){
     }
 }
 
+  
+  
 // Remocao de um dado do arquivo por nome da linguagem
-void remove(){
+void CLP::remove(){
     LingProg dado;
-                                                          
+    fstream arquivo;                                                      
     // Abrindo o arquivo em modo: Binario, leitura e escrita
-    fstream arquivo("dados.dat", ios::binary | ios::in | ios::out);     
+    arquivo.open(nomeArq, ios::binary | ios::in | ios::out);     
 
     // Modificando posicao do ponteiro de leitura e escrita
     arquivo.seekg(0);
@@ -181,7 +215,7 @@ void remove(){
     
     // variavel a ser pesquisada
     char nome[20];                                                      
-    cout << "Digite o nome da Linguagem a ser removida" <<endl;
+    cout << "| Digite o nome da Linguagem a ser removida" <<endl;
     cin.ignore();
     cout << "|> ";
     cin.getline(nome, 20);
@@ -207,12 +241,12 @@ void remove(){
 }
 
 // Busca uma linguagem ja cadastrada
-void buscar(){
+void CLP::buscar(){
     //Variavel dado para percorrer o arquivo procurando o registro
     LingProg dado;
     
     // Abertura do arquivo para leitura, em modo binario
-    ifstream arquivo("dados.dat", ios::binary);
+    ifstream arquivo(nomeArq, ios::binary);
     
     // Ponteiro de leitura no inicio
     arquivo.seekg(0);
@@ -231,55 +265,102 @@ void buscar(){
     }
     // Teste se os registro daquela posicao é o procurado e se esta ativo
     if((strcmp(dado.nome, nome) == 0) and (dado.ativo)){
-        cout << "|Nome: " << dado.nome << endl
-             << "|Ano De Criacao: " << dado.anoCriacao << endl
-             << "|Ultimo Acesso: " << dado.ultimoAcesso << endl
-             << "|Versao: " << dado.versao << endl
-             << "|Autor: " << dado.autor << endl
-             << "|Tipo: " << dado.tipo << endl
-             << endl; 
+        lingImprime(dado); 
     }
     // Mensagem caso nao encontre a linguagem buscada
     else
         cout <<"|" << nome <<" nao foi encontrada" << endl;
 }
-
-// funcao posInsercao, retorna um inteiro com a posicao de insercao
-// A posicao pode ser um registro antigo inativo, ou a ultima posicao do arquivo
-int posInsercao(){
-    // Abre o arquivo no modo leitura E BINARIO
-    ifstream arquivo("dados.dat",ios::binary);    
+/*
+void CLP::transfere(){
+    LingProg dado;
     
-    // posicao de leitura no inicio arquivo  
-    arquivo.seekg(0);
+    // abrindo o arquivo em modo leitura e setando pos no inicio
+    ifstream arq("dados.dat",ios::binary);
+    arq.seekg(0); 
+       
+    //criando um arquivo novo para registros ordenados
+    fstream arqNovo("dadosOrdenados",ios::binary | ios::out);
+    arqNovo.close();
+    arqNovo.open("dadosOrdenados.dat", ios::binary | ios::in | ios::out);
     
-    // Variavel do tipo criado ( LingProg)
-    LingProg elementos;
-    
-    // Variavel verificador de posicao                            
-    int pos=0;
-    
-    // Percorre o arquivo verificando registros excluidos
-    // Quando encontra um elemento excluido anteriormente ele para neste
-    while(( arquivo.read((char *)&elementos, sizeof(LingProg)) ) and ( elementos.ativo ) ){
-        ++pos;
+    // pos de escrita no inicio do arquivo novo
+    arqNovo.seekp(0);
+    while(arq.read((char *)&dado, sizeof(LingProg))){
+        arqNovo.write((const char *)&dado, sizeof(LingProg));
     }
-    
-    // Fecha o arquivo
-    arquivo.close();
-    
-    // Retorna a posicao 
-    // Pos * sizeof(o tamanho de LingProg), para ter a posicao exata no arquivo
-    return pos * int(sizeof(LingProg));
+}
+*/
+
+int CLP::quantRegistros(){
+    LingProg dado;
+    ifstream arq(nomeArq, ios::binary);
+    arq.seekg(0);
+    int quant=0;
+    while(arq.read((char *)&dado, sizeof(LingProg))){
+        if(dado.ativo)
+            ++quant;
+    }
+    return quant;
 }
 
 
+//---------------------------------------MAIN-----------------------------------
+int menu();
 
+int main()
+{
+    CLP cadastro;
+    
+    int op;
+    do{
+        op = menu();
+        switch(op){
+            case 0:
+                break;
+            case 1:
+                cadastro.inserir();
+                break;
+            case 2:
+                cadastro.remove();
+                break;
+            case 3:
+                cadastro.listar();
+                break;
+            case 4:
+                cadastro.buscar();
+                break;
+            case 5:
+                //transfere(); // por enquanto imprime quanti total de registros
+                cout << cadastro.quantRegistros() << endl;
+                break;
+            default:
+                cout << "| Escolha uma opcao valida" << endl;
+                break;
+        }
+    }while(op != 0);
+    
+    
+    return 0;
+};
 
-
-
-
-
-
-
-
+// Menu para informar as opcoes ao usuario
+int menu(){
+    int op;
+    cout << "|-------------------------------------------------------|" << endl
+         << "|                         MENU                          |" << endl   
+         << "|-------------------------------------------------------|" << endl
+         << "|[1] - Inserir                                          |" << endl
+         << "|[2] - remover                                          |" << endl
+         << "|[3] - listar                                           |" << endl
+         << "|[4] - buscar                                           |" << endl
+         << "|[5] - Transferir                                       |" << endl
+         << "|[0] - SAIR                                             |" << endl
+         << "|-------------------------------------------------------|" << endl; 
+    cout << "|> ";
+    cin >> op;
+    
+    // retorna um inteiro informando a opcao escolhida
+    return op;
+} 
+  
