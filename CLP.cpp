@@ -1,5 +1,12 @@
+/*
+ Lista de Exercícios Avaliativa de Estrutura de Dados
+ Professor joaguim Uchoa e Juliana Greghi
+ Copyright 2016 by Gabriel Oliveira and Eduardo Lima
+ Arquivo CLP 
+ Implementacao de um arquivo binario de linguagem de programacao
+*/
+
 #include <iostream>
-#include <cstdlib>
 #include <fstream> 
 #include <string.h>
 
@@ -19,7 +26,7 @@ int menu();
 void inserir();
 void remove();
 void listar();
-//LingProg buscar();
+void buscar();
 //CLP* transfere(CLP clp02 , opcao);
 int posInsercao();
 
@@ -41,17 +48,20 @@ int main()
             case 3:
                 listar();
                 break;
+            case 4:
+                buscar();
+                break;
             default:
-                cout << "Escolha uma opcao valida" << endl;
+                cout << "| Escolha uma opcao valida" << endl;
                 break;
         }
     }while(op != 0);
     
     
-    system("pause");
     return 0;
 }
 
+// Menu para informar as opcoes ao usuario
 int menu(){
     int op;
     cout << "|-------------------------------------------------------|" << endl
@@ -64,57 +74,88 @@ int menu(){
          << "|[5] - Transferir                                       |" << endl
          << "|[0] - SAIR                                             |" << endl
          << "|-------------------------------------------------------|" << endl; 
+    cout << "|> ";
     cin >> op;
-    return op;
-}   
-
-void inserir(){
-    LingProg novo;                                              // criando uma variavel do tipo LingProg para atribuir no arquivo
-    // Abrindo arquivo em modo de leitura
-    fstream arquivo("dados.dat", ios::binary | ios::in | ios::out );      //Abrindo arquivo ( modo binario, falando que so se pode acrecentar ) ios::binary|ios::append
-        
     
-    if(!arquivo){                   // Testa se arquivo contem erro    
-        cerr << "arquivo não pode ser aberto para gravacao" << endl;
+    // retorna um inteiro informando a opcao escolhida
+    return op;
+} 
+  
+// Insercao sera feita aparti do controle de posicao posIncercao()
+void inserir(){
+    
+    // criando uma variavel do tipo LingProg para inserir no arquivo
+    LingProg novo;
+    
+    //Abrindo arquivo em modo binario, leitura e escrita
+    fstream arquivo("dados.dat", ios::binary | ios::in | ios::out );      
+    
+    
+    // Testa se ocorreu erro na abertura
+    if(!arquivo){                      
+        cerr << "| Arquivo não pode ser aberto para gravacao" << endl;
         return;
     }
-    // Atribuindo valores a struct LingProg (linguagem de programacao)
-    cout << "|Nome: ";              // nome da linguagem
-    cin.ignore();
-    cin.getline(novo.nome, 20);     // para pegar todo o conteudo daquela linha, com essa quantidade de caracteres 
     
-    cout << "|Ano de Criacao: ";    // Ano de criacao                   // para contornar possiveis erros com caracteres anteriores
+    // Atribuindo valores ao arquivo, por struct LingProg (linguagem de programacao)
+    
+    // Para contornar possiveis erros com cadeias de caracteres anteriores usei o cin.ignore();
+    // Para pegar todo o conteudo daquela linha, com essa quantidade de caracteres usei o cin.getLine(char,int);
+    
+    // nome da linguagem
+    cout << "|Nome: "; 
+    cin.ignore();
+    cin.getline(novo.nome, 20);  
+    
+    // Ano de criacao
+    cout << "|Ano de Criacao: ";                       
     cin >> novo.anoCriacao;
     
-    cout << "|Ultimo Acesso: ";     // Ultimo acceso que teve, para possiveis modificacoes
+    // Ultimo acceso que teve, para possiveis modificacoes
+    cout << "|Ultimo Acesso: ";     
     cin >> novo.ultimoAcesso;
     
-    cout << "|versao: ";            // Versao atual
+    // Versao atual
+    cout << "|versao: ";            
     cin >> novo.versao;
     
-    cout << "|autor: ";             // Autor da linguagem
+    // Autor da linguagem
+    cout << "|autor: ";             
     cin.ignore();
     cin.getline(novo.autor, 20);
     
-    cout << "|Tipo: ";              // Tipo;  exemplos: Funcional, lógica, imperativa, POO, etc...
-    cin.getline(novo.tipo, 12);     // perde o 1º caracter da linha ao inserir
+    // Tipo;  exemplos: Funcional, lógica, imperativa, POO, etc...
+    cout << "|Tipo: ";              
     
     novo.ativo = true;
     
+    // Setando posicao de escrita na posicao de insercao
+    // posInsercao seta posicao no primeiro inativo, ou por ultimo
     arquivo.seekp(posInsercao());
-    arquivo.write((const char *)&novo, sizeof(LingProg));    // Escrita em arquivo binario, mandando a referencia do obj e o tamanho
+    
+    // Escrita em arquivo binario, mandando a referencia do obj e o tamanho
+    arquivo.write((const char *)&novo, sizeof(LingProg));    
     cout << "|-------------------------------------------------------|" << endl;
     
-    arquivo.close();                //fechando o arquivo que foi aberto
+    // Fechar arquivo
+    arquivo.close();                
 }
 
+//  Impressao dos dados do arquivo
 void listar(){
+    // Abertura do arquivo em modo binario e leitura 
     ifstream arquivo("dados.dat",ios::binary);
+    
+    // Posicao de leitura no inicio  
     arquivo.seekg(0);
+    
+    
     LingProg dados;
     
-    while(arquivo.read((char *)&dados, sizeof(LingProg))){
-        //if(dados.ativo){
+    // Teste para continuar rodando enquanto tiver registro do ttamanho LingProg
+    while(arquivo.read((char *)&dados, sizeof(LingProg))){                  
+        // Para imprimir somente os dados ativos
+        //if(dados.ativo){                                                
             cout << "|Nome: " << dados.nome << endl
                  << "|Ano De Criacao: " << dados.anoCriacao << endl
                  << "|Ultimo Acesso: " << dados.ultimoAcesso << endl
@@ -127,78 +168,108 @@ void listar(){
     }
 }
 
+// Remocao de um dado do arquivo por nome da linguagem
 void remove(){
     LingProg dado;
-    fstream arquivo("dados.dat", ios::binary | ios::in | ios::out);
+                                                          
+    // Abrindo o arquivo em modo: Binario, leitura e escrita
+    fstream arquivo("dados.dat", ios::binary | ios::in | ios::out);     
+
+    // Modificando posicao do ponteiro de leitura e escrita
     arquivo.seekg(0);
     arquivo.seekp(0);
     
-    char nome[20];
+    // variavel a ser pesquisada
+    char nome[20];                                                      
     cout << "Digite o nome da Linguagem a ser removida" <<endl;
     cin.ignore();
+    cout << "|> ";
     cin.getline(nome, 20);
     
+    // Percorrendo o arquivo para encontrar a linguagem (nome)
     int pos = 0;
-    while(arquivo.read((char *)&dado, sizeof(LingProg))){
-        if(strcmp(dado.nome, nome) == 0)
-            break;
+    while((arquivo.read((char *)&dado, sizeof(LingProg))) and !(strcmp(dado.nome, nome) == 0)){
         ++pos;
     }
+    
+    // Se encontrou no arquivo uma linguagem chmada 'Nome', desativo ela
     if((strcmp(dado.nome, nome) == 0) and (dado.ativo)){
         dado.ativo = false;
         arquivo.seekp(pos * sizeof(LingProg));
         arquivo.write((const char *)&dado, sizeof(LingProg));
     }
+    // Senao informo o usuario que nao foi encontrada
     else
-        cout << "Linguagem nao foi encontrada" << endl;
+        cout << "| Linguagem nao foi encontrada" << endl;
+    
+    // Fecha arquivo
     arquivo.close();
 }
 
-//void buscar(){
-    //LingProg dado;
+// Busca uma linguagem ja cadastrada
+void buscar(){
+    //Variavel dado para percorrer o arquivo procurando o registro
+    LingProg dado;
     
-    //ifstream arquivo("dados.dat", ios::binary);
-    //arquivo.seekg(0);
-    //char nome[20];
-    //cout << "Digite o nome da Linguagem a ser removida" <<endl;
-    //cin.ignore();
-    //cin.getline(nome, 20);
+    // Abertura do arquivo para leitura, em modo binario
+    ifstream arquivo("dados.dat", ios::binary);
     
-    //int pos = 0;
-    //while(arquivo.read((char *)&dado, sizeof(LingProg))){
-        //if(strcmp(dado.nome, nome) == 0){
-            //cout << "|Nome: " << dado.nome << endl
-                 //<< "|Ano De Criacao: " << dado.anoCriacao << endl
-                 //<< "|Ultimo Acesso: " << dado.ultimoAcesso << endl
-                 //<< "|Versao: " << dado.versao << endl
-                 //<< "|Autor: " << dado.autor << endl
-                 //<< "|Tipo: " << dado.tipo << endl
-                 //<< endl; 
-        //}
-        //++pos;
-    //}
+    // Ponteiro de leitura no inicio
+    arquivo.seekg(0);
     
-//}
-
-
-
-// quando implementar se registro ta ativo ou nao
-
-int posInsercao(){
-        
-    ifstream arquivo("dados.dat",ios::binary);      // Abre o arquivo no modo leitura
-    arquivo.seekg(0);                               // posicao de leitura no inicio arquivo
+    // Linguagem a ser procurada
+    char nome[20];
+    cout << "| Digite o nome da Linguagem a ser procurada" <<endl;
+    cin.ignore();
+    cout << "|> ";
+    cin.getline(nome, 20);
     
-    LingProg elementos;                             // Variavel do tipo criado ( LingProg)
-    int pos=0;                                      // Variavel verificador de posicao
-    
-    while(arquivo.read((char *)&elementos, sizeof(LingProg))){
-        if(!elementos.ativo){                        //  quando encontra um elemento excluido anteriormente
-            break;
-        }
-    ++pos;
+    // Procurando a linguagem especifica
+    int pos=0;
+    while((arquivo.read((char *)&dado, sizeof(LingProg))) and !(strcmp(dado.nome, nome) == 0)){
+        ++pos;
     }
+    // Teste se os registro daquela posicao é o procurado e se esta ativo
+    if((strcmp(dado.nome, nome) == 0) and (dado.ativo)){
+        cout << "|Nome: " << dado.nome << endl
+             << "|Ano De Criacao: " << dado.anoCriacao << endl
+             << "|Ultimo Acesso: " << dado.ultimoAcesso << endl
+             << "|Versao: " << dado.versao << endl
+             << "|Autor: " << dado.autor << endl
+             << "|Tipo: " << dado.tipo << endl
+             << endl; 
+    }
+    // Mensagem caso nao encontre a linguagem buscada
+    else
+        cout <<"|" << nome <<" nao foi encontrada" << endl;
+}
+
+// funcao posInsercao, retorna um inteiro com a posicao de insercao
+// A posicao pode ser um registro antigo inativo, ou a ultima posicao do arquivo
+int posInsercao(){
+    // Abre o arquivo no modo leitura E BINARIO
+    ifstream arquivo("dados.dat",ios::binary);    
+    
+    // posicao de leitura no inicio arquivo  
+    arquivo.seekg(0);
+    
+    // Variavel do tipo criado ( LingProg)
+    LingProg elementos;
+    
+    // Variavel verificador de posicao                            
+    int pos=0;
+    
+    // Percorre o arquivo verificando registros excluidos
+    // Quando encontra um elemento excluido anteriormente ele para neste
+    while(( arquivo.read((char *)&elementos, sizeof(LingProg)) ) and ( elementos.ativo ) ){
+        ++pos;
+    }
+    
+    // Fecha o arquivo
     arquivo.close();
+    
+    // Retorna a posicao 
+    // Pos * sizeof(o tamanho de LingProg), para ter a posicao exata no arquivo
     return pos * int(sizeof(LingProg));
 }
 
