@@ -5,33 +5,34 @@ using namespace std;
 
 class Conjunto{
 private:
-	int tamVetor;
-	int* elementos;
-	int qntElementos;
+	int tamVetor; //Tamanho do vetor (10 por padrão)
+	int* elementos; //"Vetor" de elementos
+	int qntElementos; //Quantidade de elementos válidos no vetor.
 public:
-	Conjunto();
-	Conjunto(const Conjunto &conj);
-	~Conjunto();
+	Conjunto(); //Construtor.
+	Conjunto(const Conjunto &conj); //Construtor de cópia
+	~Conjunto(); // Destrutor
 	//Funções obrigatórias
-	bool VerificaExistencia(int elemento);
-	void AdicionaElemento(int elemento);
-	void RemoveElemento(int elemento);
-	int TamanhoConjunto();
-	void ImprimeConjunto();
-	Conjunto& operator+(const Conjunto B);
-	Conjunto& operator-(const Conjunto B);
-	Conjunto& operator*(const Conjunto B);
+	bool VerificaExistencia(int elemento); //Verifica se o elemento existe no Conjunto
+	void AdicionaElemento(int elemento); //Adiciona um elemento ao Conjunto
+	void RemoveElemento(int elemento); //Remove Elemento do Conjunto
+	int TamanhoConjunto(); //Retorna o tamanho do Conjunto
+	void ImprimeConjunto(); //Imprime o Conjunto
+	Conjunto& operator+(const Conjunto B); //Realiza a União dos conjuntos
+	Conjunto& operator-(const Conjunto B); //Realiza a Instersecao de conjuntos
+	Conjunto& operator*(const Conjunto B); //Realiza a Diferenca de Conjuntos
 	//Funções extras
-	bool Vazio();
-	bool Cheio();
+	bool Vazio(); //Vefifica se está cheio
+	bool Cheio(); //Verifica se está vazio
 };
 
+//Contrutor.
 Conjunto::Conjunto(){
 	tamVetor = 10;
 	elementos = new int[tamVetor];
 	qntElementos = 0;
 }
-
+//Construtor de cópia
 Conjunto::Conjunto(const Conjunto &conj){
 	tamVetor = conj.tamVetor;
 	qntElementos = conj.qntElementos;
@@ -41,12 +42,14 @@ Conjunto::Conjunto(const Conjunto &conj){
 	}
 }
 
+//Destrutor
 Conjunto::~Conjunto(){
 	delete[] elementos;
 	tamVetor = 0;
 	qntElementos = 0;
 }
 
+//Verifica se o elemento existe no conjunto;
 bool Conjunto::VerificaExistencia (int elemento){
 	for (int i = 0; i < qntElementos ; i++){
 		if (elementos[i] == elemento)
@@ -55,18 +58,18 @@ bool Conjunto::VerificaExistencia (int elemento){
 	return false;
 }
 
+//Adiciona elemento no conjunto;
 void Conjunto::AdicionaElemento (int elemento){
 	if (VerificaExistencia(elemento)){
-		// cout << "Elemento já existe! \nConjunto não modificado \n";
 	}else if (Cheio()){
 		cout << "Conjunto cheio!" << endl;
 	}else{
-		// cout << "Inserindo elemento " << elemento << " na posicao: " << qntElementos << endl;
 		elementos[qntElementos] = elemento;
 		qntElementos++;
 	}
 }
 
+//Remove elemento do conjunto
 void Conjunto::RemoveElemento (int elemento){
 	if (VerificaExistencia(elemento)){
 		for (int i = 0; i < qntElementos; i++){
@@ -86,11 +89,13 @@ void Conjunto::RemoveElemento (int elemento){
 		cout << "Elemento não está no conjunto!" << endl;
 	}
 }
-		
+
+//Retorna o tamanho do conjunto;		
 int Conjunto::TamanhoConjunto(){
 	return qntElementos;
 }
 
+//Imprime o conjunto;
 void Conjunto::ImprimeConjunto(){
 	if (!Vazio()){
 		for (int i = 0; i < qntElementos; i++){
@@ -99,14 +104,17 @@ void Conjunto::ImprimeConjunto(){
 	}
 }
 
+//Verifica se o conjunto esta vazio
 bool Conjunto::Vazio(){
 	return (qntElementos == 0);
 }
 
+//Verifica se o conjunto esa cheio
 bool Conjunto::Cheio(){
 	return (qntElementos == tamVetor);
 }
 
+//Retorna a união de dois conjuntos;
 Conjunto& Conjunto::operator+(const Conjunto B){
 	Conjunto* result = new Conjunto;
 	for (int i = 0; i < this->qntElementos; i++){
@@ -118,6 +126,7 @@ Conjunto& Conjunto::operator+(const Conjunto B){
 	return *result;
 }
 
+//Retorna a intersecao de dois conjuntos;
 Conjunto& Conjunto::operator-(const Conjunto B){
 	Conjunto* result = new Conjunto;
 	for (int i = 0; i < this->qntElementos; i++){
@@ -130,6 +139,7 @@ Conjunto& Conjunto::operator-(const Conjunto B){
 	return *result;
 }
 
+//Retorna a diferenca de dois conjuntos;
 Conjunto& Conjunto::operator*(const Conjunto B){
 	Conjunto* result = new Conjunto;
 	for (int i = 0; i < this->qntElementos; i++){
@@ -146,13 +156,15 @@ Conjunto& Conjunto::operator*(const Conjunto B){
 	return *result;
 }
 
+//Breve explanação do programa
 void introducao(){
 	cout << "|---------------------------------------------|" << endl;
 	cout << "|                 Introducao                  |" << endl;
 	cout << "|---------------------------------------------|" << endl;
-	cout << "Neste programa voce ira trabalhar com os conjuntos A, B e C (Todos estao vazios) \n\n. Voce pode adicionar e remover elementos e fazer operacoes descritas no menu!" << endl; 
+	cout << "Neste programa voce ira trabalhar com os conjuntos A, B e C (Por hora estão vazios!)(O conjunto cabe 10 elementos!) \n\n. Voce pode adicionar e remover elementos e fazer operacoes descritas no menu!" << endl; 
 }
 
+//Menu principal do programa
 int menuPrincipal(){
 	cout << "|---------------------------------------------|" << endl;
 	cout << "|                    MENU                     |" << endl;
@@ -172,6 +184,8 @@ int menuPrincipal(){
 	cin >> opcao;
 	return opcao;
 }
+
+// **************** SUB-MENUS DERIVADOS DO MENU PRINCIPAL ***************************;
 
 int menuAdicionarElementos(){
 	cout << "|--------------------------------------------------|" << endl;
@@ -408,6 +422,8 @@ void menuDiferencaElementos(Conjunto A, Conjunto B, Conjunto C){
    	return;
 }
 
+// ***************** FUNÇÕES INDIVIDUAIS DOS SUB-MENUS VOLTADA PARA CADA CONJUNTO ***********************
+
 void menuAdicionarElementosA(Conjunto* A){
 	cout << "|--------------------------------------------------|" << endl;
 	cout << "|     1 - Adicionando elementos no conjunto A      |" << endl;
@@ -607,19 +623,19 @@ void menuImpressaoC(Conjunto* C){
 
 
 int main(){
-	introducao();
-	Conjunto A, B, C;
+	introducao(); // Chama a introdução para o usuário;
+	Conjunto A, B, C; //Cria três conjuntos para o usuário modificar;
 	int op;
 	do{
-		op = menuPrincipal();
+		op = menuPrincipal(); // Chama o menu principal
 		switch(op){
-			case 0:
+			case 0: // Sai do programa;
 				break;
-			case 1:
+			case 1: // Adiciona Elementos
 				int opAdicionar;
 				do{
 					opAdicionar = menuAdicionarElementos();
-					switch(opAdicionar){
+					switch(opAdicionar){  //Escolhe em qual conjunto vai adicionar
 						case 0:
 							break;
 						case 1:
@@ -637,11 +653,11 @@ int main(){
 					}
 				}while(opAdicionar != 0);	
 				break;
-			case 2:
+			case 2: //Remover elementos
 				int opRemover;
 				do{
 					opRemover = menuRemoverElementos();
-					switch(opRemover){
+					switch(opRemover){ //Escolhe em qual conjunto vai remover;
 						case 0:
 							break;
 						case 1:
@@ -659,11 +675,11 @@ int main(){
 					}
 				}while(opAdicionar != 0);	
 				break;
-			case 3:
+			case 3: //Verifica se tal elemento existe no conjunto
 				int opVerifica;
 				do{
 					opVerifica = menuVerificaElementos();
-					switch(opVerifica){
+					switch(opVerifica){ //Escolhe em qual conjunto vai verificar;
 						case 0:
 							break;
 						case 1:
@@ -681,11 +697,11 @@ int main(){
 					}
 				}while(opAdicionar != 0);	
 				break;
-			case 4:
+			case 4: //Opção para retornar o tamanho
 				int opTamanho;
 				do{
 					opTamanho = menuTamanhoConjunto();
-					switch(opTamanho){
+					switch(opTamanho){ //Escolhe qual conjunto quer ver o tamanho;
 						case 0:
 							break;
 						case 1:
@@ -703,11 +719,11 @@ int main(){
 					}
 				}while(opTamanho != 0);	
 				break;
-			case 5:
+			case 5: //Opção para imprimir o conjunto
 				int opImpressao;
 				do{
 					opImpressao = menuImpressao();
-					switch(opImpressao){
+					switch(opImpressao){ // Escolhe qual conjunto vai imprimir;
 						case 0:
 							break;
 						case 1:
@@ -725,13 +741,13 @@ int main(){
 					}
 				}while(opImpressao != 0);	
 				break;
-			case 6:
+			case 6: //Realiza a união de elementos
 				menuUniaoElementos(A,B,C);
 				break;
-			case 7:
+			case 7: //Realiza a intersecao de elementos
 				menuIntersecaoElementos(A,B,C);
 				break;
-			case 8:
+			case 8: //Realiza a diferenca de elementos
 				menuDiferencaElementos(A,B,C);
 				break;
 			default:
@@ -742,7 +758,3 @@ int main(){
 	return 0;
 }	
 	
-	
-
-
-
