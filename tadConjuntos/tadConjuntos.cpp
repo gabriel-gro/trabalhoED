@@ -136,34 +136,64 @@ void menuUniaoElementos(Conjunto A, Conjunto B, Conjunto C){
     cout << "|-----------------------------------------------------------|" << endl;
    int op1, op2;
     cin >> op1 >> op2;
-    Conjunto S;
+    Conjunto S(20);
     if (op1 == 1 and op2 == 2){
-    	S = A+B;
+    	try{
+        S = A+B;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }  
     	cout << "UNIÃO = ";
-    	S.ImprimeConjunto();
+      S.ImprimeConjunto();
     	cout << endl;
     }else if (op1 == 1 and op2 == 3){
-    	S = A+C;
-    	cout << "UNIÃO = ";
+    	try{
+        S = A+C;
+    	}catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
+      cout << "UNIÃO = ";
     	S.ImprimeConjunto();
     	cout << endl;
     }else if (op1 == 2 and op2 == 1){
-   		S = B+A;
+   		try{
+        S = B+A;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "UNIÃO = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 2 and op2 == 3){
-   		S = B+C;
+   		try{
+        S = B+C;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "UNIÃO = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 3 and op2 == 1){
-   		S = C+A;
+   		try{
+        S = C+A;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "UNIÃO = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 3 and op2 == 2){
-   		S = C+B;
+   		try{
+        S = C+B;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "UNIÃO = ";
     	S.ImprimeConjunto();
     	cout << endl;
@@ -188,33 +218,64 @@ void menuIntersecaoElementos(Conjunto A, Conjunto B, Conjunto C){
     cout << "|-----------------------------------------------------------------------|" << endl;
    int op1, op2;
     cin >> op1 >> op2;
+    Conjunto S(20);
     if (op1 == 1 and op2 == 2){
-    	Conjunto S = A-B;
+    	try{
+        S = A-B;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "INTERSECAO = ";
     	S.ImprimeConjunto();
     	cout << endl;
     }else if (op1 == 1 and op2 == 3){
-    	Conjunto S = A-C;
+    	try{
+        S = A-C;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "INTERSECAO = ";
     	S.ImprimeConjunto();
     	cout << endl;
     }else if (op1 == 2 and op2 == 1){
-   		Conjunto S = B-A;
+   		try{
+        S = B-A;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "INTERSECAO = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 2 and op2 == 3){
-   		Conjunto S = B-C;
+   		try{
+        S = B-C;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "INTERSECAO = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 3 and op2 == 1){
-   		Conjunto S = C-A;
+   		try{
+        S = C-A;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "INTERSECAO = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 3 and op2 == 2){
-   		Conjunto S = C-B;
+   		try{
+        S = C-B;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "INTERSECAO = ";
     	S.ImprimeConjunto();
     	cout << endl;
@@ -238,34 +299,65 @@ void menuDiferencaElementos(Conjunto A, Conjunto B, Conjunto C){
     cout << "|0 - Sair desse menu                                                    |" << endl;
     cout << "|-----------------------------------------------------------------------|" << endl;
    int op1, op2;
+   Conjunto S(20);
     cin >> op1 >> op2;
     if (op1 == 1 and op2 == 2){
-    	Conjunto S = A*B;
+    	try{
+        S = A*B;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "DIFERENCA = ";
     	S.ImprimeConjunto();
     	cout << endl;
     }else if (op1 == 1 and op2 == 3){
-    	Conjunto S = A*C;
+    	try{
+        S = A*C;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "DIFERENCA = ";
     	S.ImprimeConjunto();
     	cout << endl;
     }else if (op1 == 2 and op2 == 1){
-   		Conjunto S = B*A;
+   		try{
+        S = B*A;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "DIFERENCA = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 2 and op2 == 3){
-   		Conjunto S = B*C;
+   		try{
+        S = B*C;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "DIFERENCA = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 3 and op2 == 1){
-   		Conjunto S = C*A;
+   		try{
+        S = C*A;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "DIFERENCA = ";
     	S.ImprimeConjunto();
     	cout << endl;
    	}else if (op1 == 3 and op2 == 2){
-   		Conjunto S = C*B;
+   		try{
+        S = C*B;
+      }catch (excecao e){
+        cerr << e.msg() << endl;
+        exit(EXIT_FAILURE);
+      }
     	cout << "DIFERENCA = ";
     	S.ImprimeConjunto();
     	cout << endl;
@@ -289,7 +381,11 @@ void menuAdicionarElementosA(Conjunto* A){
 	int elemento;
 	cin >> elemento;
 	while (elemento != -999){
-		A->AdicionaElemento(elemento);
+    try{
+		  A->AdicionaElemento(elemento); 
+    }catch (excecao e){
+      cerr << e.msg() << endl;
+    }
 		cin >> elemento;
 	}
 }

@@ -4,10 +4,35 @@
 
 using namespace std;
 
+excecao::excecao(TipoExcecao t, int l){
+	tipo = t;
+	linha = l;
+}
+
+string excecao::msg(){
+	stringstream stream;
+	stream << "Ocorreu um problema: ";
+	switch(tipo){
+		case opConjuntoVazio:
+			stream << "Você tentou realizar uma operação com um conjunto vazio ";
+			break;
+		case conjuntoCheio:
+			stream << "Você está tentando adicionar elementos em um conjunto que está cheio! ";
+			break;
+	}
+	return stream.str();
+ }
+
 //Contrutor.
 Conjunto::Conjunto(){
 	tamVetor = 10;
 	elementos = new int[tamVetor];
+	qntElementos = 0;
+}
+
+Conjunto::Conjunto(int tamVet){
+	tamVetor = tamVet;
+	elementos = new int[tamVet];
 	qntElementos = 0;
 }
 //Construtor de cópia
@@ -35,12 +60,13 @@ bool Conjunto::VerificaExistencia (int elemento){
 	}
 	return false;
 }
-
+  
 //Adiciona elemento no conjunto;
 void Conjunto::AdicionaElemento (int elemento){
 	if (VerificaExistencia(elemento)){
+		return;
 	}else if (Cheio()){
-		cout << "Conjunto cheio!" << endl;
+		throw excecao(conjuntoCheio,__LINE__);
 	}else{
 		elementos[qntElementos] = elemento;
 		qntElementos++;
@@ -63,8 +89,6 @@ void Conjunto::RemoveElemento (int elemento){
 				qntElementos--;
 			}
 		}
-	}else{
-		cout << "Elemento não está no conjunto!" << endl;
 	}
 }
 
@@ -93,8 +117,11 @@ bool Conjunto::Cheio(){
 }
 
 //Retorna a união de dois conjuntos;
-Conjunto& Conjunto::operator+(const Conjunto B){
+Conjunto& Conjunto::operator+(Conjunto B){
 	Conjunto* result = new Conjunto;
+	if (Vazio() or B.Vazio()){
+		throw excecao(opConjuntoVazio,__LINE__);
+	}
 	for (int i = 0; i < this->qntElementos; i++){
 		result->AdicionaElemento(this->elementos[i]);
 	}
@@ -105,8 +132,11 @@ Conjunto& Conjunto::operator+(const Conjunto B){
 }
 
 //Retorna a intersecao de dois conjuntos;
-Conjunto& Conjunto::operator-(const Conjunto B){
+Conjunto& Conjunto::operator-( Conjunto B){
 	Conjunto* result = new Conjunto;
+	if (Vazio() or B.Vazio()){
+		throw excecao(opConjuntoVazio,__LINE__);
+	}
 	for (int i = 0; i < this->qntElementos; i++){
 		for (int j = 0; j < B.qntElementos; j++){
 			if (this->elementos[i] == B.elementos[j]){
@@ -118,8 +148,11 @@ Conjunto& Conjunto::operator-(const Conjunto B){
 }
 
 //Retorna a diferenca de dois conjuntos;
-Conjunto& Conjunto::operator*(const Conjunto B){
+Conjunto& Conjunto::operator*(Conjunto B){
 	Conjunto* result = new Conjunto;
+	if (Vazio() or B.Vazio()){
+		throw excecao(opConjuntoVazio,__LINE__);
+	}
 	for (int i = 0; i < this->qntElementos; i++){
 		bool existe = false;
 		for (int j = 0; j < B.qntElementos ; j++){

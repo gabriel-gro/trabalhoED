@@ -1,7 +1,21 @@
 #ifndef CONJUNTO_H
 #define CONJUNTO_H 1
 
+#include <string>
+#include <sstream>
+
 using namespace std;
+
+enum TipoExcecao {opConjuntoVazio,conjuntoCheio};
+
+class excecao{
+private:
+	TipoExcecao tipo;
+	int linha;
+public:	
+	excecao(TipoExcecao t, int l);
+	string msg();
+};
 
 
 class Conjunto{
@@ -11,6 +25,7 @@ private:
 	int qntElementos; //Quantidade de elementos válidos no vetor.
 public:
 	Conjunto(); //Construtor.
+	Conjunto(int tamvet);
 	Conjunto(const Conjunto &conj); //Construtor de cópia
 	~Conjunto(); // Destrutor
 	//Funções obrigatórias
