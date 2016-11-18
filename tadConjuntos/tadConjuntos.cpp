@@ -1,3 +1,14 @@
+/*
+ Lista de Exercícios Avaliativa de Estrutura de Dados
+ Professor joaguim Uchoa e Juliana Greghi
+ Copyright 2016 by Gabriel Oliveira and Eduardo Lima
+ tadConjuntos.cpp - Contém o main e funções para o menu;
+ Conjunto.cpp - Implementação dos métodos da classe Conjunto;
+ Conujnto.h - Header da classe Conjunto; 
+ Implementação da estrutura de dados do tipo conjunto(Set);
+*/
+
+
 #include <iostream>
 #include <cstdlib>
 #include "Conjunto.h"

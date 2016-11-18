@@ -1,3 +1,4 @@
+
 CC=g++
 CPPFLAGS=-W -Wall
 
