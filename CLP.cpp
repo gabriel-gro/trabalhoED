@@ -60,6 +60,7 @@ LingProg novoDado(){
     return novo;
 }
 
+// principal funcao ultilizada para teste no programa
 void lingImprime(LingProg dados){
     cout << "\n|Nome: " << dados.nome << endl
          << "|Ano De Criacao: " << dados.anoCriacao << endl
@@ -84,7 +85,7 @@ class CLP{
         void buscar();
         void transfere();
         unsigned int quantRegistros();
-        void insereOrdem(LingProg dados);
+        void insereOrdem(LingProg dados, int op);
 };
 
 // Criando um arquivo binario externo
@@ -272,38 +273,61 @@ void CLP::buscar(){
         cout <<"|" << nome <<" nao foi encontrada" << endl;
 }
 
+// 
 void CLP::transfere(){
-    CLP novoReg("dadosOrdenados.dat");
+    // transfere os dados do arquivo atual, inserindo ordenado no novo
+    cout << "| Criando um novo arquivo\n"
+         << "| Qual o nome do arquivo a ser transferido:\n>";
+    char arqNome[20];
+    cin.ignore();
+    cin.getline(arqNome,20);
+    CLP novoReg(arqNome);
+
+    // Para o usuario digitar somente as duas opcoes
+    int op;
+    while((op != 1) and (op != 2)){
+        cout << "| [1] Ordenar por nome " << endl
+             << "| [2] Ordenar por ano de criacao ?\n| >";
+            cin >> op;
+        if((op != 1) and (op != 2))
+            cout << "| Digite uma opcao valida\n";
+            
+    }
     
     fstream arquivo("dados.dat", ios::binary | ios::in);
     arquivo.seekg(0);
     arquivo.seekp(0);
     LingProg dados;
     while(arquivo.read((char *)&dados, sizeof(LingProg))){
-        //lingImprime(dados);
-        novoReg.insereOrdem(dados);
-        //cout << "reg inserido" << endl;
-        //cout << arquivo.tellg() << endl;
+        novoReg.insereOrdem(dados, op);
     }
     
     arquivo.close();
 }
 
-void CLP::insereOrdem(LingProg dados){//LingProg dados){
-   
+void CLP::insereOrdem(LingProg dados,int op){//LingProg dados){
     
+    // Abrindo o arquivo em modo de leitura e escrita
     fstream arq(nomeArq, ios::binary | ios::in | ios::out);
 
     LingProg dados2;
     arq.seekp(0);
     arq.seekg(0);
     int posInserir=0;
-
-    while(arq.read((char *)&dados2, sizeof(LingProg)) and (dados.anoCriacao > dados2.anoCriacao)){
-        ++posInserir;
+    
+    if(op==1){
+        while(arq.read((char *)&dados2, sizeof(LingProg)) and (strcmp(dados.nome, dados2.nome) > 0)){
+            ++posInserir;
+        }
     }
+    else{
+        // Procura o local onde precisa inserir para ordenar
+        while(arq.read((char *)&dados2, sizeof(LingProg)) and dados.anoCriacao > dados2.anoCriacao){
+            ++posInserir;
+        }
+    }
+    // Caso a leitura de erro
     if(!arq){
-        cout << "erro\n";
         arq.clear();
     }
     else{
@@ -314,6 +338,8 @@ void CLP::insereOrdem(LingProg dados){//LingProg dados){
             arq.write((const char *)&dados2, sizeof(LingProg));
         }
     }
+    
+    // Inserindo no local ja ordenado
     arq.seekp(posInserir * sizeof(LingProg));
     arq.write((const char *)&dados, sizeof(LingProg));
     arq.close();
@@ -340,9 +366,12 @@ int main()
     cout << "|-------------------------------------------------------|" << endl
          << "|      Programa para cadastro e armazenamento de        |" << endl
          << "|              Linguagens de programacao                |" << endl
-         << "|-------------------------------------------------------|" << endl;
-    CLP cadastro("dadosOrdenados.dat");
-    
+         << "|-------------------------------------------------------|" << endl
+         << "| Digite o nome do arquivo de linguagens de programacao |" << endl
+         << "| > ";
+    char nome[20];
+    cin.getline(nome,20);
+    CLP cadastro(nome);
     int op;
     do{
         op = menu();
@@ -363,14 +392,10 @@ int main()
                 break;
             case 4:
                 cout << "| - Buscar -" << endl;
-                
-                
                 cadastro.buscar();
                 break;
             case 5:
-                //LingProg dados;
-                //dados = novoDado();
-                //cadastro.insereOrdem(dados); // por enquanto imprime quanti total de registros
+                cout << "| - Transferir dados -" << endl;
                 cadastro.transfere();
                 break;
             default:
@@ -392,8 +417,8 @@ int menu(){
          << "|[1] - Inserir                                          |" << endl
          << "|[2] - remover                                          |" << endl
          << "|[3] - listar                                           |" << endl
-         << "|[4] - buscar                                           |" << endl
-         << "|[5] - Transferir                                       |" << endl
+         << "|[4] - buscar linguagem                                 |" << endl
+         << "|[5] - Transferir dados para um aruivo ordenado         |" << endl
          << "|[0] - SAIR                                             |" << endl
          << "|-------------------------------------------------------|" << endl; 
     cout << "|> ";
