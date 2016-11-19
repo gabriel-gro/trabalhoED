@@ -280,10 +280,10 @@ void CLP::transfere(){
     arquivo.seekp(0);
     LingProg dados;
     while(arquivo.read((char *)&dados, sizeof(LingProg))){
-        lingImprime(dados);
+        //lingImprime(dados);
         novoReg.insereOrdem(dados);
-        cout << "reg inserido" << endl;
-        cout << arquivo.tellg() << endl;
+        //cout << "reg inserido" << endl;
+        //cout << arquivo.tellg() << endl;
     }
     
     arquivo.close();
