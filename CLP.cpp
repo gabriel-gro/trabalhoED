@@ -23,6 +23,43 @@ typedef struct{
     bool ativo;
 }LingProg;
 
+LingProg novoDado(){
+    LingProg novo;
+    
+    // Para contornar possiveis erros com cadeias de caracteres anteriores usei o cin.ignore();
+    // Para pegar todo o conteudo daquela linha, com essa quantidade de caracteres usei o cin.getLine(char,int);
+    
+    // nome da linguagem
+    cout << "|Nome: "; 
+    cin.ignore();
+    cin.getline(novo.nome, 20);  
+    
+    // Ano de criacao
+    cout << "|Ano de Criacao: ";                       
+    cin >> novo.anoCriacao;
+    
+    // Ultimo acceso que teve, para possiveis modificacoes
+    cout << "|Ultimo Acesso: ";     
+    cin >> novo.ultimoAcesso;
+    
+    // Versao atual
+    cout << "|versao: ";            
+    cin >> novo.versao;
+    
+    // Autor da linguagem
+    cout << "|autor: ";             
+    cin.ignore();
+    cin.getline(novo.autor, 20);
+    
+    // Tipo;  exemplos: Funcional, lógica, imperativa, POO, etc...
+    cout << "|Tipo: ";              
+    cin.getline(novo.tipo, 12);
+    
+    novo.ativo = true;
+    
+    return novo;
+}
+
 void lingImprime(LingProg dados){
     cout << "\n|Nome: " << dados.nome << endl
          << "|Ano De Criacao: " << dados.anoCriacao << endl
@@ -46,7 +83,8 @@ class CLP{
         void remove();
         void buscar();
         void transfere();
-        int quantRegistros();
+        unsigned int quantRegistros();
+        void insereOrdem(LingProg dados);
 };
 
 // Criando um arquivo binario externo
@@ -108,18 +146,11 @@ void CLP::inserir(){
     // criando uma variavel do tipo LingProg para inserir no arquivo
     LingProg novo;
     
+    novo = novoDado();
+    
     //Abrindo arquivo em modo binario, leitura e escrita
     arquivo.open(nomeArq, ios::binary | ios::in | ios::out ); 
-    
-    
-    //Caso arquivo nao tenha sido criado antes
-    //if(!arquivo){
-        //arquivo.close();
-        //arquivo.open(nomeArq, ios::out);
-        //arquivo.close();
-        //arquivo.open(nomeArq, ios::binary | ios::in | ios::out );   
-    //}
-    
+        
     // Testa se ocorreu erro na abertura
     if(!arquivo){                      
         cerr << "| Arquivo não pode ser aberto para gravacao" << endl;
@@ -127,37 +158,6 @@ void CLP::inserir(){
     }
     
     // Atribuindo valores ao arquivo, por struct LingProg (linguagem de programacao)
-    
-    // Para contornar possiveis erros com cadeias de caracteres anteriores usei o cin.ignore();
-    // Para pegar todo o conteudo daquela linha, com essa quantidade de caracteres usei o cin.getLine(char,int);
-    
-    // nome da linguagem
-    cout << "|Nome: "; 
-    cin.ignore();
-    cin.getline(novo.nome, 20);  
-    
-    // Ano de criacao
-    cout << "|Ano de Criacao: ";                       
-    cin >> novo.anoCriacao;
-    
-    // Ultimo acceso que teve, para possiveis modificacoes
-    cout << "|Ultimo Acesso: ";     
-    cin >> novo.ultimoAcesso;
-    
-    // Versao atual
-    cout << "|versao: ";            
-    cin >> novo.versao;
-    
-    // Autor da linguagem
-    cout << "|autor: ";             
-    cin.ignore();
-    cin.getline(novo.autor, 20);
-    
-    // Tipo;  exemplos: Funcional, lógica, imperativa, POO, etc...
-    cout << "|Tipo: ";              
-    cin.getline(novo.tipo, 12);
-    
-    novo.ativo = true;
     
     // Setando posicao de escrita na posicao de insercao
     // posInsercao seta posicao no primeiro inativo, ou por ultimo
@@ -271,28 +271,56 @@ void CLP::buscar(){
     else
         cout <<"|" << nome <<" nao foi encontrada" << endl;
 }
-/*
-void CLP::transfere(){
-    LingProg dado;
-    
-    // abrindo o arquivo em modo leitura e setando pos no inicio
-    ifstream arq("dados.dat",ios::binary);
-    arq.seekg(0); 
-       
-    //criando um arquivo novo para registros ordenados
-    fstream arqNovo("dadosOrdenados",ios::binary | ios::out);
-    arqNovo.close();
-    arqNovo.open("dadosOrdenados.dat", ios::binary | ios::in | ios::out);
-    
-    // pos de escrita no inicio do arquivo novo
-    arqNovo.seekp(0);
-    while(arq.read((char *)&dado, sizeof(LingProg))){
-        arqNovo.write((const char *)&dado, sizeof(LingProg));
-    }
-}
-*/
 
-int CLP::quantRegistros(){
+void CLP::transfere(){
+    CLP novoReg("dadosOrdenados.dat");
+    
+    fstream arquivo("dados.dat", ios::binary | ios::in);
+    arquivo.seekg(0);
+    arquivo.seekp(0);
+    LingProg dados;
+    while(arquivo.read((char *)&dados, sizeof(LingProg))){
+        lingImprime(dados);
+        novoReg.insereOrdem(dados);
+        cout << "reg inserido" << endl;
+        cout << arquivo.tellg() << endl;
+    }
+    
+    arquivo.close();
+}
+
+void CLP::insereOrdem(LingProg dados){//LingProg dados){
+   
+    
+    fstream arq(nomeArq, ios::binary | ios::in | ios::out);
+
+    LingProg dados2;
+    arq.seekp(0);
+    arq.seekg(0);
+    int posInserir=0;
+
+    while(arq.read((char *)&dados2, sizeof(LingProg)) and (dados.anoCriacao > dados2.anoCriacao)){
+        ++posInserir;
+    }
+    if(!arq){
+        cout << "erro\n";
+        arq.clear();
+    }
+    else{
+        for (int i = quantRegistros(); i > posInserir ; --i){
+            arq.seekg((i-1) * sizeof(LingProg));
+            arq.read((char *)&dados2, sizeof(LingProg));
+            arq.seekp(i * sizeof(LingProg));
+            arq.write((const char *)&dados2, sizeof(LingProg));
+        }
+    }
+    arq.seekp(posInserir * sizeof(LingProg));
+    arq.write((const char *)&dados, sizeof(LingProg));
+    arq.close();
+}
+
+// utilizada para testes, pode se conseguir pos total com quantRegistro * sizeof(LingProg)
+unsigned int CLP::quantRegistros(){
     LingProg dado;
     ifstream arq(nomeArq, ios::binary);
     arq.seekg(0);
@@ -304,13 +332,16 @@ int CLP::quantRegistros(){
     return quant;
 }
 
-
 //---------------------------------------MAIN-----------------------------------
 int menu();
 
 int main()
 {
-    CLP cadastro;
+    cout << "|-------------------------------------------------------|" << endl
+         << "|      Programa para cadastro e armazenamento de        |" << endl
+         << "|              Linguagens de programacao                |" << endl
+         << "|-------------------------------------------------------|" << endl;
+    CLP cadastro("dadosOrdenados.dat");
     
     int op;
     do{
@@ -319,20 +350,28 @@ int main()
             case 0:
                 break;
             case 1:
+                cout << "| - Inserir -" << endl;
                 cadastro.inserir();
                 break;
             case 2:
+                cout << "| - Remover -" << endl;
                 cadastro.remove();
                 break;
             case 3:
+                cout << "| - Listar -" << endl;
                 cadastro.listar();
                 break;
             case 4:
+                cout << "| - Buscar -" << endl;
+                
+                
                 cadastro.buscar();
                 break;
             case 5:
-                //transfere(); // por enquanto imprime quanti total de registros
-                cout << cadastro.quantRegistros() << endl;
+                //LingProg dados;
+                //dados = novoDado();
+                //cadastro.insereOrdem(dados); // por enquanto imprime quanti total de registros
+                cadastro.transfere();
                 break;
             default:
                 cout << "| Escolha uma opcao valida" << endl;
