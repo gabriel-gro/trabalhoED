@@ -5,6 +5,7 @@
  CLPmain.cpp - Contém o main e inserção de dados;
  CLP.cpp - Implementação do CLP com uma estrutura para facilitar a insercao de um novo registro
  CLP.h - Header da classe pilha 
+ BaseExemplo.dat arquivo base que foi solicitado, outros exemplos sao as ordenacoes, por nome e por ano
  Implementação de um cadastro de linguagens de programacao(C.L.P);
 */
 
