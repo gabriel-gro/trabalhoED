@@ -1,9 +1,11 @@
 /*
- Lista de Exercícios Avaliativa de Estrutura de Dados
+Lista de Exercícios Avaliativa de Estrutura de Dados
  Professor joaguim Uchoa e Juliana Greghi
  Copyright 2016 by Gabriel Oliveira and Eduardo Lima
- Arquivo CLP 
- Implementacao de um arquivo binario de linguagem de programacao
+ CLPmain.cpp - Contém o main e inserção de dados;
+ CLP.cpp - Implementação do CLP com uma estrutura para facilitar a insercao de um novo registro
+ CLP.h - Header da classe pilha 
+ Implementação de um cadastro de linguagens de programacao(C.L.P);
 */
 
 #include <iostream>
@@ -12,6 +14,26 @@
 #include "CLP.h"
 
 
+//construtor da excecao
+excecao::excecao(TipoExcecao t){ //Construindo excecao
+    tipo = t;
+}
+
+//Define a mensagem que vai ser entregue na excecao;
+string excecao::msg(){
+    stringstream stream;
+    stream << endl << "| Ocorreu um problema: ";
+    switch (tipo){
+        case arqOff:
+            stream << endl << "| Erro Ao Abrir Arquivo, Corrompido ou nao foi criado\n| Criando...";
+            break;
+    }
+    return stream.str();
+}
+
+
+
+//----------------------- Funcoes auxiliares ---------------------------
 // Funcao extra para novo dados, da estrutura
 LingProg novoDado(){
     LingProg novo;
@@ -46,7 +68,6 @@ LingProg novoDado(){
     cin.getline(novo.tipo, 12);
     
     novo.ativo = true;
-    
     return novo;
 }
 
@@ -62,7 +83,9 @@ void lingImprime(LingProg dados){
          << "|Ativo: "<< dados.ativo << endl
          << endl;
 }
+//----------------------------------------------------------------------
 
+//---------------------- Funcoes da classe CLP -------------------------
 // Criando um arquivo binario externo
 CLP::CLP(const char nome[] = "dados.dat"){
     fstream arquivo;
@@ -122,17 +145,22 @@ void CLP::inserir(){
     // criando uma variavel do tipo LingProg para inserir no arquivo
     LingProg novo;
     
-    novo = novoDado();
-    
     //Abrindo arquivo em modo binario, leitura e escrita
     arquivo.open(nomeArq, ios::binary | ios::in | ios::out ); 
         
     // Testa se ocorreu erro na abertura
-    if(!arquivo){                      
-        cerr << "| Arquivo não pode ser aberto para gravacao" << endl;
+    try{
+        if(!arquivo)                    
+            throw excecao(arqOff);
+            
+    }
+    catch(excecao e){
+        cerr << e.msg() << endl;
+        arquivo.close();
+        arquivo.open(nomeArq, ios::binary | ios::out );
         return;
     }
-    
+    novo = novoDado();
     // Atribuindo valores ao arquivo, por struct LingProg (linguagem de programacao)
     
     // Setando posicao de escrita na posicao de insercao
@@ -149,7 +177,7 @@ void CLP::inserir(){
 
 // Impressao dos dados do arquivo
 void CLP::listar(){
-    fstream arquivo;
+     fstream arquivo;
     //Abertura do arquivo em modo binario e leitura 
     arquivo.close();
     arquivo.open(nomeArq,ios::binary | ios::in);
@@ -157,13 +185,13 @@ void CLP::listar(){
      //Posicao de leitura no inicio  
     arquivo.seekg(0);
     
-    
+    cout << endl;
     LingProg dados;
     
      //Teste para continuar rodando enquanto tiver registro do ttamanho LingProg
     while(arquivo.read((char *)&dados, sizeof(LingProg))){                  
          //Para imprimir somente os dados ativos
-        //if(dados.ativo){                                                
+        if(dados.ativo){                                                
             cout << "|Nome: " << dados.nome << endl
                  << "|Ano De Criacao: " << dados.anoCriacao << endl
                  << "|Ultimo Acesso: " << dados.ultimoAcesso << endl
@@ -172,11 +200,40 @@ void CLP::listar(){
                  << "|Tipo: " << dados.tipo << endl
                  << "|Ativo: "<< dados.ativo << endl
                  << endl; 
-        //}
+        }
     }
 }
 
-  
+// COmo tive problemas com a conversao de string, char e const char, preferi deixar duas funcoes quase iguais
+void CLP::listar(const char nome[]){
+    fstream arquivo;
+    //Abertura do arquivo em modo binario e leitura 
+    arquivo.close();
+    arquivo.open(nome,ios::binary | ios::in);
+    if(!arquivo)
+        cout << "| Arquivo " << nome <<" nao existe\n";
+    //Posicao de leitura no inicio  
+    arquivo.seekg(0);
+    
+    cout << endl;    
+    LingProg dados;
+    int pos=0;
+     //Teste para continuar rodando enquanto tiver registro do ttamanho LingProg
+    while(arquivo.read((char *)&dados, sizeof(LingProg))){                  
+         //Para imprimir somente os dados ativos
+        if(dados.ativo){                                                
+            cout << "|Nome: " << dados.nome << endl
+                 << "|Ano De Criacao: " << dados.anoCriacao << endl
+                 << "|Ultimo Acesso: " << dados.ultimoAcesso << endl
+                 << "|Versao: " << dados.versao << endl
+                 << "|Autor: " << dados.autor << endl
+                 << "|Tipo: " << dados.tipo << endl
+                 << "|Ativo: "<< dados.ativo << endl
+                 << endl; 
+            ++pos;
+        }
+    }
+}
   
 // Remocao de um dado do arquivo por nome da linguagem
 void CLP::remove(){
@@ -210,7 +267,7 @@ void CLP::remove(){
     }
     // Senao informo o usuario que nao foi encontrada
     else
-        cout << "| Linguagem nao foi encontrada" << endl;
+        cout << "| Linguagem nao encontrada \n";
     
     // Fecha arquivo
     arquivo.close();
@@ -240,12 +297,11 @@ void CLP::buscar(){
         ++pos;
     }
     // Teste se os registro daquela posicao é o procurado e se esta ativo
-    if((strcmp(dado.nome, nome) == 0) and (dado.ativo)){
+    if((strcmp(dado.nome, nome) == 0) and (dado.ativo))
         lingImprime(dado); 
-    }
     // Mensagem caso nao encontre a linguagem buscada
     else
-        cout <<"|" << nome <<" nao foi encontrada" << endl;
+        cout << "| Linguagem nao encontrada\n";
 }
 
 // 
@@ -257,27 +313,42 @@ void CLP::transfere(){
     cin.ignore();
     cin.getline(arqNome,20);
     CLP novoReg(arqNome);
-
+    if(novoReg.arqExiste(arqNome)) novoReg.deletar();
+    
     // Para o usuario digitar somente as duas opcoes
-    int op;
+    
+    int op=0;
     while((op != 1) and (op != 2)){
         cout << "| [1] Ordenar por nome " << endl
              << "| [2] Ordenar por ano de criacao ?\n| >";
-            cin >> op;
-        if((op != 1) and (op != 2))
-            cout << "| Digite uma opcao valida\n";
-            
+        cin >> op;
+            if((op != 1) and (op != 2))
+                cout << "| Digite uma opcao valida\n";
     }
     
-    fstream arquivo("dados.dat", ios::binary | ios::in);
+    fstream arquivo(nomeArq, ios::binary | ios::in);
     arquivo.seekg(0);
     arquivo.seekp(0);
     LingProg dados;
     while(arquivo.read((char *)&dados, sizeof(LingProg))){
-        novoReg.insereOrdem(dados, op);
+        if(dados.ativo)
+            novoReg.insereOrdem(dados, op);
     }
     
     arquivo.close();
+}
+
+// utilizada para testes, pode se conseguir pos total com quantRegistro * sizeof(LingProg)
+unsigned int CLP::quantRegistros(){
+    LingProg dado;
+    ifstream arq(nomeArq, ios::binary);
+    arq.seekg(0);
+    int quant=0;
+    while(arq.read((char *)&dado, sizeof(LingProg))){
+        if(dado.ativo)
+            ++quant;
+    }
+    return quant;
 }
 
 void CLP::insereOrdem(LingProg dados,int op){//LingProg dados){
@@ -297,7 +368,7 @@ void CLP::insereOrdem(LingProg dados,int op){//LingProg dados){
     }
     else{
         // Procura o local onde precisa inserir para ordenar
-        while(arq.read((char *)&dados2, sizeof(LingProg)) and dados.anoCriacao > dados2.anoCriacao){
+        while(arq.read((char *)&dados2, sizeof(LingProg)) and (dados.anoCriacao > dados2.anoCriacao)){
             ++posInserir;
         }
     }
@@ -320,15 +391,8 @@ void CLP::insereOrdem(LingProg dados,int op){//LingProg dados){
     arq.close();
 }
 
-// utilizada para testes, pode se conseguir pos total com quantRegistro * sizeof(LingProg)
-unsigned int CLP::quantRegistros(){
-    LingProg dado;
-    ifstream arq(nomeArq, ios::binary);
-    arq.seekg(0);
-    int quant=0;
-    while(arq.read((char *)&dado, sizeof(LingProg))){
-        if(dado.ativo)
-            ++quant;
-    }
-    return quant;
+void CLP::deletar(){
+    fstream arquivo(nomeArq, ios::binary | ios::out);
+    arquivo.clear();
+    arquivo.close();
 }

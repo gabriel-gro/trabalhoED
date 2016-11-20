@@ -17,6 +17,17 @@
 
 using namespace std;
 
+enum TipoExcecao{arqOff}; //Define os tipos de excecoes;
+
+//Declara a classe exceção
+class excecao{
+private:
+    TipoExcecao tipo;
+public:
+    excecao(TipoExcecao t);
+    string msg();
+};
+
 // Estrutura de um registro Tipo: LingProg
 typedef struct{
     char nome[20];
@@ -38,11 +49,14 @@ class CLP{
         int posInsercao();                              // Verifica e retorna a posicao de insercao
         void inserir();                                 // Insercao de um novo registro
         void listar();                                  // Listagem de todos registro no arquivo(nomeArq)
+        void listar(const char nome[20]);               // Listar todos registros de um arquivo externo
         void remove();                                  // Remover = Indicar que um registro nao esta mais ativo
         void buscar();                                  // Busca um registro pelo nome
         void transfere();                               // Transfere todos registro desse arquivo para outro de modo ordenado
         unsigned int quantRegistros();                  // Me indica a quantidade de registros, ativos, contidos no arquivo
         void insereOrdem(LingProg dados, int op);       // Insere um novo registro no arquivo de modo ordenado
+        void deletar();                                 // Deleta todos dados de um arquivo
+        
 };
 
 #endif

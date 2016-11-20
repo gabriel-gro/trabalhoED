@@ -9,6 +9,7 @@
 */
 
 #include <iostream>
+#include <cstdlib>
 #include "CLP.h"
 
 using namespace std;
@@ -21,8 +22,16 @@ void intro(){
          << "|-------------------------------------------------------|" << endl
          << "| Digite o nome do arquivo de linguagens de programacao |" << endl
          << "|  Se o nomo nao existir, sera criado um novo arquivo   |" << endl
-         << "|   Lembresse de colocar a extensao no nome do arquivo  |" << endl
+         << "|  Lembresse de colocar a extensao no nome do arquivo   |" << endl
+         << "|          Ver arquivos na pasta do programa ?          |" << endl
+         << "|                [1] - SIM | [0] - NAO                  |" << endl
          << "| > ";
+         int op;
+         cin >> op;
+         if(op==1) system("dir") ;
+         cout << "\n| Ditige o nome do arquivo: ";
+         
+         
 }
 
 
@@ -32,11 +41,15 @@ int menu(){
     cout << "|-------------------------------------------------------|" << endl
          << "|                         MENU                          |" << endl   
          << "|-------------------------------------------------------|" << endl
-         << "|[1] - Inserir nova l                                         |" << endl
+         << "|[1] - Inserir nova linguagem                           |" << endl
          << "|[2] - remover                                          |" << endl
          << "|[3] - listar                                           |" << endl
          << "|[4] - buscar linguagem                                 |" << endl
-         << "|[5] - Transferir dados para um aruivo ordenado         |" << endl
+         << "|[5] - listar registros de outro arquivo                |" << endl
+         << "|[6] - Transferir dados para um aruivo ordenado         |" << endl
+         << "|[7] - Deletar todos dados desse registro               |" << endl
+         << "|[8] - Quntidade de registros existentes neste arquivo  |" << endl
+         << "|[9] - Ver nome de arquivos externos na pasta           |" << endl
          << "|[0] - SAIR                                             |" << endl
          << "|-------------------------------------------------------|" << endl; 
     cout << "|> ";
@@ -51,13 +64,13 @@ int main(){
     intro();
     
     // Usuario digita o nome do arquivo a ser criado, lembrando de exstencao
-    char nome[20];
-    cin.getline(nome,20);
+    string nome;
+    cin >> nome;
     cout << "|-------------------------------------------------------|" << endl;
     
     // Variavel da classe CLP;
-    CLP cadastro(nome);
-    //cfd
+    CLP cadastro(nome.c_str());
+    
     int op; 
     do{
         op = menu();
@@ -65,8 +78,8 @@ int main(){
             case 0:
                 break;
             case 1:
-                cout << "| - Inserir -" << endl;
-                cadastro.inserir();
+                    cout << "| - Inserir -" << endl;
+                    cadastro.inserir();
                 break;
             case 2:
                 cout << "| - Remover -" << endl;
@@ -81,8 +94,28 @@ int main(){
                 cadastro.buscar();
                 break;
             case 5:
+                cout << "| - Listar registros de um arquivo externo -\n";
+                cout << "| Digite o nome do arquivo externo:\n>";
+                cin >> nome;
+                cadastro.listar(nome.c_str());
+                break;
+            case 6:
                 cout << "| - Transferir dados -" << endl;
                 cadastro.transfere();
+                break;
+            case 7:
+                cout << "| - Deletar todos reregistros desse arquivo -\n"
+                     << "| Tem certeza disso? [1] - NAO | [2] - SIM\n";
+                cin >> op;
+                if(op==2) cadastro.deletar();
+                break;
+            case 8:
+                cout << "| Existem "<< cadastro.quantRegistros()
+                     << " registros neste arquivo \n";
+                break;
+            case 9:
+                system("dir");
+                cout << endl;
                 break;
             default:
                 cout << "| - Escolha uma opcao valida -" << endl;
